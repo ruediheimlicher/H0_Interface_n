@@ -176,7 +176,7 @@ class rRobot: rViewController
    
    
    
-   var hintergrundfarbe = NSColor()
+  // var hintergrundfarbe = NSColor()
    
    var lastwinkel:CGFloat = 3272
    
@@ -244,11 +244,8 @@ class rRobot: rViewController
       self.view.window?.acceptsMouseMovedEvents = true
       //let view = view[0] as! NSView
       self.view.wantsLayer = true
-      hintergrundfarbe  = NSColor.init(red: 0.25, 
-                                       green: 0.45, 
-                                       blue: 0.45, 
-                                       alpha: 0.25)
-      self.view.layer?.backgroundColor =  hintergrundfarbe.cgColor
+      
+      self.view.layer?.backgroundColor =  hintergrundfarbe as! CGColor
       formatter.maximumFractionDigits = 1
       formatter.minimumFractionDigits = 2
       formatter.minimumIntegerDigits = 1
@@ -439,7 +436,7 @@ class rRobot: rViewController
       Drehknopf_Stepper_L_Feld.integerValue = Int(DrehknopfFeld.minwinkel)
       Drehknopf_Stepper_L.integerValue = Int(DrehknopfFeld.minwinkel)
       
-      DrehknopfFeld.hgfarbe = hgfarbe
+      //DrehknopfFeld.hintergrundfarbe = hintergrundfarbe
       print("Robot globalusbstatus: \(globalusbstatus)")
       
       loknummer.selectSegment(withTag: 0)

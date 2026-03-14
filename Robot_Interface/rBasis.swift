@@ -133,7 +133,7 @@ class rBasis: rViewController
    let STEPS_BYTE_H = 26
    let STEPS_BYTE_L = 27
 */
-   var hintergrundfarbe:NSColor = NSColor()
+   //var hintergrundfarbe:NSColor = NSColor()
    
    override func viewDidAppear() 
    {

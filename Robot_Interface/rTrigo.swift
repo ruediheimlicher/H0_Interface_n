@@ -67,7 +67,7 @@ class rTrigo: rViewController
    
 
 
-   var hintergrundfarbe = NSColor()
+   //var hintergrundfarbe = NSColor()
    
    var lastwinkel:CGFloat = 3272
    
@@ -162,7 +162,7 @@ class rTrigo: rViewController
       Drehknopf_Stepper_L_Feld.integerValue = Int(DrehknopfFeld.minwinkel)
       Drehknopf_Stepper_L.integerValue = Int(DrehknopfFeld.minwinkel)
       
-      DrehknopfFeld.hgfarbe = hgfarbe
+      DrehknopfFeld.hintergrundfarbe = hintergrundfarbe
       print("Trigo globalusbstatus: \(globalusbstatus)")
       
       

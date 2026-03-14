@@ -16,7 +16,7 @@ class rJoystickView: NSView
    var mittelpunkt:NSPoint = NSZeroPoint
    var winkel:CGFloat = 0
    var hyp:CGFloat = 0
-   var hgfarbe:NSColor = NSColor()
+   var hintergrundfarbe:NSColor = NSColor()
    
    required init?(coder  aDecoder : NSCoder) 
    {

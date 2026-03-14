@@ -11,7 +11,7 @@ import Cocoa
 import Foundation
 
  public var lastDataRead = Data.init(count:64)
-
+public var boardindex = 0
 
 var globalusbstatus = 0
 
@@ -190,7 +190,7 @@ class rViewController: NSViewController, NSWindowDelegate
    
    var selectedDevice:String = ""
    
-   var hgfarbe  = NSColor()
+   var hintergrundfarbe  = NSColor()
    
   
    
@@ -338,6 +338,8 @@ class rViewController: NSViewController, NSWindowDelegate
       var manufactorername = "-"
       
       self.view.window?.delegate = self as? NSWindowDelegate 
+     
+      /*
       let erfolg = teensy.USBOpen()
       if erfolg == 1
       {
@@ -354,7 +356,7 @@ class rViewController: NSViewController, NSWindowDelegate
       nc.post(name:Notification.Name(rawValue:"usb_status"),
               object: nil,
               userInfo: userinformation)
-
+       */
    }
 
    @objc func beendenAktion(_ notification:Notification) 
@@ -969,33 +971,32 @@ class rViewController: NSViewController, NSWindowDelegate
       //myUSBController.startRead(1)
       if teensy.dev_present() > 0
       {
-         var start_read_USB_erfolg = teensy.start_read_USB(true)
+         var timerdic = [String:Any]()
+         var start_read_USB_erfolg = teensy.start_read_USB(true,dic:timerdic)
+         
          Start_Knopf.isEnabled = false
          Stop_Knopf.isEnabled = true
-
+         
       }
       else
       {
+         
          let warnung = NSAlert.init()
-         warnung.messageText = "USB"
+         warnung.messageText = "USB start read"
          warnung.messageText = "report_start_read_USB: Kein USB-Device"
          warnung.addButton(withTitle: "OK")
          warnung.runModal()
+         
          Start_Knopf.isEnabled = false
          Stop_Knopf.isEnabled = false
-
-      }
-      
-      //teensy.start_teensy_Timer()
-      
-      //     var somethingToPass = "It worked"
-      
-      //      let timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("tester:"), userInfo: somethingToPass, repeats: true)
+      }     
       
    }
    
    @IBAction func check_USB(_ sender: NSButton)
    {
+      return
+      /*
       let present = teensy.dev_present()
       let hidstatus = teensy.status()
       let nc = NotificationCenter.default
@@ -1085,6 +1086,7 @@ class rViewController: NSViewController, NSWindowDelegate
          return
       }
       //print("antwort: \(teensy.status())")
+       */
    }
    
    @IBAction func report_stop_read_USB(_ sender: AnyObject)

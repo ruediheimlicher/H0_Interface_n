@@ -341,7 +341,7 @@ class rDrehknopfView: rJoystickView
                                                         blue: 0.85, 
                                                         alpha: 0.25) 
       
-      hgfarbe  = NSColor.init(red: 0.25, 
+      hintergrundfarbe  = NSColor.init(red: 0.25, 
                               green: 0.25, 
                               blue: 0.85, 
                               alpha: 0.25)
@@ -356,7 +356,7 @@ class rDrehknopfView: rJoystickView
       //    currentContext.strokePath()
       
       NSColor.blue.set() // choose color
-      hgfarbe.set() // choose color
+      hintergrundfarbe.set() // choose color
       
       knopfpfad.fill()
       //     kreuz.stroke()
@@ -378,7 +378,7 @@ class rDrehknopfView: rJoystickView
       NSColor.yellow.set() 
       trigohintergrundfarbe.set()
       
-      hgfarbe.set()
+      hintergrundfarbe.set()
       //   abdeckpfad.fill()
       //   var zeigerrand:NSBezierPath = NSBezierPath(rect:zeigerbereich)
       //      zeigerrand.stroke()

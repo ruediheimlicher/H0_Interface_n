@@ -137,14 +137,14 @@ class rRobotarm: NSView {
    override func draw(_ dirtyRect: NSRect) 
    {
       super.draw(dirtyRect)
-      let hgfarbe  = NSColor.init(red: 0.25, 
+      let hintergrundfarbe  = NSColor.init(red: 0.25, 
                               green: 0.25, 
                               blue: 0.85, 
                               alpha: 0.25)
       
       let currentContext = NSGraphicsContext.current!.cgContext
       currentContext.setLineWidth(2)
-      hgfarbe.set()
+      hintergrundfarbe.set()
       rahmen.fill()
       NSColor.gray.set() // 
       achsen.stroke()
