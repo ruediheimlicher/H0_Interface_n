@@ -199,6 +199,7 @@ class rTimerInfo
    var datatruecounter = 0
    var datafalsecounter = 0
    
+   var readtimer: Timer?
    
    var manustring:String = ""
    var prodstring:String = ""
