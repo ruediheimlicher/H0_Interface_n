@@ -168,9 +168,23 @@ class rDeviceTabViewController: NSTabViewController
 class rViewController: NSViewController, NSWindowDelegate
 {
  
+   var addressarray = Array(repeating: Array(repeating: UInt8(0x00), count: ANZLOKS), count: 4)
 
+   
+   @IBOutlet weak var USBKontrolle: NSTextField!
    let notokimage :NSImage = NSImage(named:NSImage.Name(rawValue: "notok_image"))!
    let okimage :NSImage = NSImage(named:NSImage.Name(rawValue: "ok_image"))!
+   
+   let USBATTACHED = 5
+   let USBREMOVED  = 6
+   
+   
+   let SCAN:UInt8 = 0xF0
+   
+   
+   
+   var hintergrundfarbe = NSColor()
+   
    // Robot
    var z0:Float = 30 // Hoehe Drehpunkt 0
    var l0:Float = 1// laenge Arm 0
@@ -190,7 +204,7 @@ class rViewController: NSViewController, NSWindowDelegate
    
    var selectedDevice:String = ""
    
-   var hintergrundfarbe  = NSColor()
+   //var hintergrundfarbe  = NSColor()
    
   
    
@@ -240,7 +254,14 @@ class rViewController: NSViewController, NSWindowDelegate
       NotificationCenter.default.addObserver(self, selector:#selector(tabviewAktion(_:)),name:NSNotification.Name(rawValue: "tabview"),object:nil)
       NotificationCenter.default.addObserver(self, selector: #selector(beendenAktion), name:NSNotification.Name(rawValue: "beenden"), object: nil)
       
+ //     NotificationCenter.default.addObserver(self, selector:#selector(HIDInputReportReceivedAktion(_:)),name:NSNotification.Name(rawValue: "HIDInputReportReceived"),object:nil)
       
+      NotificationCenter.default.addObserver(self, selector:#selector(usbattachAktion(_:)),name:NSNotification.Name(rawValue: "usb_attach"),object:nil)
+      
+      NotificationCenter.default.addObserver(self, selector:#selector(usbstatusAktion(_:)),name:NSNotification.Name(rawValue: "usb_status"),object:nil)
+      
+      NotificationCenter.default.addObserver(self, selector:#selector(weichenstatusAktion(_:)),name:NSNotification.Name(rawValue: "weichenstatus"),object:nil)
+
       
       defaults.set(25, forKey: "Age")
       defaults.set(true, forKey: "UseTouchID")
@@ -337,27 +358,220 @@ class rViewController: NSViewController, NSWindowDelegate
       var userinformation:[String : Any]
       var manufactorername = "-"
       
-      self.view.window?.delegate = self as? NSWindowDelegate 
-     
-      /*
-      let erfolg = teensy.USBOpen()
-      if erfolg == 1
+      self.view.window?.delegate = self 
+      startHIDManager()
+      var teensypresent:Int32 = 0
+      teensypresent = teensy.dev_present()
+      
+      
+      if (teensypresent == 0) // Noch nichts eingesteckt
       {
-         USB_OK_Feld.image = okimage
-         manufactorername = teensy.manustring
-         usbstatus = Int32(1)
+         USBKontrolle.stringValue = "USB OFF"
+         USB_OK_Feld.image = notokimage
+         let warnung = NSAlert.init()
+         warnung.messageText = "USB"
+         warnung.messageText = "viewDidAppear: Kein USB-Device"
+         warnung.addButton(withTitle: "OK")
+         warnung.runModal()
+         
+         
+         usbstatus = Int32(0)
+         globalusbstatus = 0
+         //      USBKontrolle.stringValue="USB OFF"
+         
+         
+      }
+      
+      //usbstatus = Int32(1)
+      self.view.window?.delegate = self //as? NSWindowDelegate 
+      
+      
+      
+      self.view.window?.makeKey()
+   }
+   
+   @objc  func weichenstatusAktion(_ notification:Notification) 
+   {
+      let info = notification.userInfo
+      print("VC weichenstatusAktion info: \(info)")
+      //guard var  weichenstatusint = notification.userInfo?["weichenstatus"]as? [Int] else {return}
+      
+      guard var weichendata   = notification.userInfo?["data"]as? UInt8 else 
+      {
+         print("weichetag tag ist nil")
+         return
+         
+      }
+      guard var weiche   = notification.userInfo?["weiche"]as? UInt8 else 
+      {
+         print("weiche tag ist nil")
+         return
+         
+      }
+      print("VC weichenstatusAktion weiche: \(weiche)")
+      
+      guard var ablenkung   = notification.userInfo?["ablenkung"]as? UInt8 else 
+      {
+         print("ablenkung tag ist nil")
+         return
+         
+      }
+      print("VC weichenstatusAktion ablenkung: \(ablenkung)")
+      
+      let weichenstatus:[UInt8] = [1,2,2,2]
+      teensy.write_byteArray[0] =  0b10111111// code
+      
+      //loknummer = ANZLOKS-1
+      
+      let code = 0xBF
+      
+      let loknummer = ANZLOKS-1
+      
+      teensy.write_byteArray[20] = UInt8(code)
+      teensy.write_byteArray[20] = UInt8(loknummer)
+      teensy.write_byteArray[21] = 2 // sourcestatus
+      
+      
+      
+      addressarray[loknummer][0] = UInt8(weichenstatus[0])
+      addressarray[loknummer][1] = UInt8(weichenstatus[1])
+      addressarray[loknummer][2] = UInt8(weichenstatus[2])
+      addressarray[loknummer][3] = UInt8(weichenstatus[3])
+      
+      teensy.write_byteArray[16] = ablenkung // funktion
+      teensy.write_byteArray[17] = weiche // speed
+      
+      for i in 0...3
+      {
+         teensy.write_byteArray[8 + i] = addressarray[ANZLOKS-1][i]
+      }
+      
+      print("VC  weichenstatusAktion write_byteArray: \(teensy.write_byteArray)")
+      if (usbstatus > 0)
+      {
+         let senderfolg = teensy.send_USB()
+         print("VC weichenstatusAktion senderfolg: \(senderfolg)")
+      }
+      
+      
+   }
+   
+   @objc func usbstatusAktion(_ notification:Notification) 
+   {
+      let info = notification.userInfo
+      let status = info?["usbstatus"] as! Int32 // 
+      let manufactorer = info?["manufactorer"] as! String
+      print("VC usbstatusAktion:\t \(status) manufactorer: \(manufactorer)")
+      usbstatus = Int32(status)
+   }
+   
+   @objc func usbattachAktion(_ note:Notification) //von hid attach_callback
+   {
+      
+      if let ident = self.view.identifier
+      {
+         print("usbattachAktion ident: \(ident)")
       }
       else
       {
-         USB_OK_Feld.image = notokimage
-         usbstatus = Int32(0)
+         print("usbattachAktion ident ist nil")
       }
-      userinformation = ["message":"usb", "usbstatus": usbstatus,"manufactorer": manufactorername] as [String : Any]
-      nc.post(name:Notification.Name(rawValue:"usb_status"),
-              object: nil,
-              userInfo: userinformation)
-       */
+      let info = note.userInfo
+      print("VC usbattachAktion info: \(info )")
+      let status = info?["attach"] as! Int
+      
+      var usbattachstatus = info?["usbattachstatus"] as! Int
+      
+      print("ViewController usbattachAktion status: \(status) globalusbstatus: \(globalusbstatus) usbattachstatus: \(usbattachstatus)");
+      
+      if  (status == USBATTACHED)
+      {
+         //print("ViewController usbattachAktion USBATTACHED");
+         print("\nViewController usbattachAktion USBATTACHED  globalusbstatus: \(globalusbstatus)")
+         let product_ID = teensy.dev_present()
+         print("ViewController usbattachAktion productID: \(product_ID) usbattachstatus: \(usbattachstatus)")
+         
+         if ((product_ID == 1) && (usbattachstatus == 0))
+         {
+            print("ViewController usbattachAktion usbattachstatus==0")
+            //self.Attach_USB()
+         }
+         if (self.view.identifier == NSUserInterfaceItemIdentifier("cv"))
+         {
+            print("ident passt")
+            USB_OK_Feld.image = okimage
+            USBKontrolle.stringValue = "USB ON"
+         }
+         globalusbstatus = 1
+         usbstatus = 1
+         print("ViewController usbattachAktion USBATTACHED")
+         
+      }
+      
+      else if (status == USBREMOVED)
+      {
+         if (self.view.identifier == NSUserInterfaceItemIdentifier("cv"))
+         {
+            print("ident passt")
+            USB_OK_Feld.image = notokimage
+            USBKontrolle.stringValue = "USB OFF"
+         }
+
+         //USB_OK_Feld.image = notokimage
+         globalusbstatus = 0
+         usbstatus = 0
+         print("\nViewController usbattachAktion USBREMOVED ")
+         //       teensy.usb_free()
+         
+         
+      }
+      
    }
+   
+   
+   @objc func HIDInputReportReceivedAktion(_ notification:Notification)
+   {
+      print("VC HIDInputReportReceivedAktion: \(notification)")
+      let produkt = notification.userInfo?["product"] as! Int
+      let produktInt = Int32(produkt)
+      switch (produktInt)
+      {
+      case TEENSY2_PID:
+         print("HW HIDInputReportReceivedAktion Teensy2")
+         //BoardFeld.stringValue = "Teensy2"
+         boardindex = 0
+         //boardnumber = 0;
+         break
+      case TEENSY3_PID:
+         print("HW HIDInputReportReceivedAktion Teensy3")
+         //BoardFeld.stringValue = "Teensy3"
+         boardindex = 1
+         if (teensy.read_OK.boolValue == false)
+         {
+            print("teensy.read_OK ist false")
+            // let result = teensy.start_read_USB(true, dic:timerdic)
+            // print("teensy.read_OK status ist: \(result)")
+         }
+         
+         break
+      case 0:
+         print("HW HIDInputReportReceivedAktion disconnected")
+         usbstatus = 0
+         //BoardFeld.stringValue = "--"
+      default:
+         //BoardFeld.stringValue = "--"
+         break
+      }
+      
+      
+      //var timerdic:[String:Any] = [String:Any]()
+      //timerdic["home"] = 0
+      
+      
+      //    let result = teensy.start_read_USB(true, dic:timerdic)
+      //print("teensy.read_OK status ist: \(result)")
+   }
+ 
 
    @objc func beendenAktion(_ notification:Notification) 
    {

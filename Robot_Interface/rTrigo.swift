@@ -175,7 +175,7 @@ class rTrigo: rViewController
    }
 
    
-   @objc func usbstatusAktion(_ notification:Notification) 
+   @objc override func usbstatusAktion(_ notification:Notification) 
    {
       let info = notification.userInfo
       let status = info?["usbstatus"] as! Int32 // 

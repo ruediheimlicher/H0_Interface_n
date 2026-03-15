@@ -14,7 +14,6 @@ class rBasis: rViewController
   // var servoPfad = rServoPfad()
  //  var usbstatus: Int32 = 0
    
- //  var teensy = usb_teensy()
    /*
    @IBOutlet weak var manufactorer: NSTextField!
    @IBOutlet weak var Counter: NSTextField!
@@ -224,7 +223,7 @@ class rBasis: rViewController
    
    }
  
-   @objc func usbstatusAktion(_ notification:Notification) 
+   @objc override func usbstatusAktion(_ notification:Notification) 
    {
       let info = notification.userInfo
       let status = info?["usbstatus"] as! Int32 // 

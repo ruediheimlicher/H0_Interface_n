@@ -211,7 +211,7 @@ class rRobot: rViewController
    var scana2:UInt8 = 0
    var scana3:UInt8 = 0
    
-   var addressarray = Array(repeating: Array(repeating: UInt8(0x00), count: ANZLOKS), count: 4)
+   //var addressarray = Array(repeating: Array(repeating: UInt8(0x00), count: ANZLOKS), count: 4)
    
    var speedarray:[UInt8] = [UInt8](repeating: 0x00, count: ANZLOKS)
    
@@ -516,7 +516,7 @@ class rRobot: rViewController
    
    
    
-   @objc func usbstatusAktion(_ notification:Notification) 
+   @objc override func usbstatusAktion(_ notification:Notification) 
    {
       let info = notification.userInfo
       let status = info?["usbstatus"] as! Int32 // 

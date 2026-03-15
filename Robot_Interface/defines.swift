@@ -8,6 +8,15 @@
 
 import Foundation
 
+let TEENSY3_TITLE = "Teensy 3.x"
+let TEENSY3_VID:Int32 = 0x16C0
+let TEENSY3_PID:Int32 = 0x0486
+
+let TEENSY2_TITLE = "Teensy 2"
+let TEENSY2_VID:Int32 = 0x16C0
+let TEENSY2_PID:Int32 = 0x0480
+
+
 let GOTO_0:UInt8  =  0xA7
 let SET_RING:UInt8  =  0xA3
 let CLEAR_RING:UInt8  =  0xA4
