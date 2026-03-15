@@ -238,14 +238,19 @@ class rRobot: rViewController
    }
    
    
+  
+   
    override func viewDidLoad() 
    {
       super.viewDidLoad()
       self.view.window?.acceptsMouseMovedEvents = true
       //let view = view[0] as! NSView
       self.view.wantsLayer = true
-      
-      self.view.layer?.backgroundColor =  hintergrundfarbe as! CGColor
+      let robothintergrundfarbe:NSColor  = NSColor.init(red: 0.15, 
+                              green: 0.85, 
+                              blue: 0.45, 
+                              alpha: 0.25)
+      self.view.layer?.backgroundColor =    robothintergrundfarbe.cgColor
       formatter.maximumFractionDigits = 1
       formatter.minimumFractionDigits = 2
       formatter.minimumIntegerDigits = 1
@@ -1440,8 +1445,8 @@ class rRobot: rViewController
       
       teensy.write_byteArray[17] = speed
       
-            print("teensy.write_byteArray:")
-            print("\(teensy.write_byteArray[8...18])")
+            print("report_Slider teensy.write_byteArray:")
+            print("\(teensy.write_byteArray[0...18])")
       
       (self.view.viewWithTag(2000 + loktag) as! NSTextField).intValue = Int32(pos)
       
@@ -1452,6 +1457,7 @@ class rRobot: rViewController
       teensy.write_byteArray[20] = UInt8(loktag)
       
       //print("lok: \(loktag) write_byteArray: \(teensy.write_byteArray)")
+      print("lok: \(loktag) task: \(teensy.write_byteArray[0]) speed: \(teensy.write_byteArray[17])")
       if (usbstatus > 0)
       {
          let senderfolg = teensy.send_USB()
@@ -1612,12 +1618,14 @@ class rRobot: rViewController
          funktion = 1
       }
       teensy.write_byteArray[16] = funktion // Richtung
+      print("report_Funktion teensy.write_byteArray:")
+      print("\(teensy.write_byteArray[0...18])")
       if (usbstatus > 0)
       {
          let senderfolg = teensy.send_USB()
          if (senderfolg < BUFFER_SIZE)
          {
-            print("report_Funktion: %d",senderfolg)
+            print("report_Funktion: code: \(teensy.write_byteArray[0]) funktion: \(teensy.write_byteArray[16]) senderfolg: \(senderfolg)")
          }
       }
    }

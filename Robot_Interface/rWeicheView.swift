@@ -198,15 +198,16 @@ class rWeichenradiogruppeV:NSView
       titelFeld.isBezeled = false
       titelFeld.drawsBackground = false
       titelFeld.isEditable = false
+      
       titelFeld.font = NSFont(name: "Helvetica", size: 20)
       addSubview(titelFeld)
       
       self.wantsLayer = true
-      hintergrundfarbe  = NSColor.init(red: 0, 
-                                       green: 1.0, 
-                                       blue: 1.0, 
+      let weichehintergrundfarbe  = NSColor.init(red: 0.1, 
+                                       green: 0.5, 
+                                       blue: 0.2, 
                                        alpha: 0.25)
-      self.layer?.backgroundColor =  NSColor.systemGreen.cgColor
+      self.layer?.backgroundColor =  weichehintergrundfarbe.cgColor
       
       
       
@@ -300,12 +301,12 @@ class rWeichenradioView:NSView
       NotificationCenter.default.addObserver(self, selector:#selector(tastenstatusAktion(_:)),name:NSNotification.Name(rawValue: "tastenstatus"),object:nil)
       
       self.wantsLayer = true
-      hintergrundfarbe  = NSColor.init(red: 1, 
-                                       green: 0.2, 
-                                       blue: 0, 
+      let weicheviewhintergrundfarbe  = NSColor.init(red: 0.1, 
+                                       green: 0.6, 
+                                       blue: 0.4, 
                                        alpha: 0.25)
-      //self.layer?.backgroundColor =  hintergrundfarbe.cgColor
-      self.layer?.backgroundColor =  NSColor.yellow.cgColor
+      self.layer?.backgroundColor =  weicheviewhintergrundfarbe.cgColor
+      //self.layer?.backgroundColor =  NSColor.yellow.cgColor
       let w:CGFloat = bounds.size.width
       let h:CGFloat = bounds.size.height
       var switchH:CGFloat = 32

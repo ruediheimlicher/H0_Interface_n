@@ -441,12 +441,16 @@ class rViewController: NSViewController, NSWindowDelegate
       teensy.write_byteArray[16] = ablenkung // funktion
       teensy.write_byteArray[17] = weiche // speed
       
+      // Adresse schreiben
       for i in 0...3
       {
          teensy.write_byteArray[8 + i] = addressarray[ANZLOKS-1][i]
       }
       
-      print("VC  weichenstatusAktion write_byteArray: \(teensy.write_byteArray)")
+      //print("VC  weichenstatusAktion write_byteArray: \(teensy.write_byteArray)")
+      print("VC  weichenstatusAktion teensy.write_byteArray:")
+      print("\(teensy.write_byteArray[0...18])")
+
       if (usbstatus > 0)
       {
          let senderfolg = teensy.send_USB()
