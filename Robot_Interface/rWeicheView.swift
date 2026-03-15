@@ -12,6 +12,10 @@ import AppKit
 
 //var numtasten:Int = 8
 
+let geradeimage:NSImage = NSImage(named: NSImage.Name("WS_Gerade"))!
+let ablenkungimage:NSImage = NSImage(named: NSImage.Name("WS_Ablenkung"))!
+
+
 class rWeichenradio: NSButton 
 {
    var radionummer:Int = 0
@@ -161,7 +165,8 @@ class rWeichenradiogruppeV:NSView
    var weichenstatus:[Int] = Array(repeating: 0, count: 2) 
    var weichenstellung:UInt8 = 0;
    var radio0:rWeichenradio! 
-   var radio1:rWeichenradio! 
+   var radio1:rWeichenradio!
+   var symbolView:NSImageView!
    
    required init?(coder  aDecoder : NSCoder) 
    {
@@ -187,9 +192,12 @@ class rWeichenradiogruppeV:NSView
       let h:CGFloat = bounds.size.height
       let th:CGFloat = 28
       let tw:CGFloat = 28
-      let titelfeldrect = NSMakeRect(w/2 - tw/2, h/2 - th/2 , th,tw)
+      let titelfeldrect = NSMakeRect(w/2 - tw/2, h - th - 2 , th,tw)
       titelFeld = NSTextField(frame:titelfeldrect )
       titelFeld.alignment = .center
+      titelFeld.isBezeled = false
+      titelFeld.drawsBackground = false
+      titelFeld.isEditable = false
       titelFeld.font = NSFont(name: "Helvetica", size: 20)
       addSubview(titelFeld)
       
@@ -205,21 +213,31 @@ class rWeichenradiogruppeV:NSView
       let tasteW:CGFloat = 20
       let tasteH:CGFloat = 20
       
-      var tastenrect : NSRect = NSMakeRect(5 ,10 , tasteW,tasteH)
+      var tastenrect : NSRect = NSMakeRect(5 ,h/2 - 2 * tasteH , tasteW,tasteH)
       var radiotaste0 = rWeichenradio(frame:tastenrect)
       
-      radio0 = rWeichenradio(frame:tastenrect)
+      radio0 = rWeichenradio(frame:tastenrect) // untere Taste
       //radio0.setValue(10)
+      radio0.state = .on
       radio0.name = "radio0"
+      addSubview(radio0) 
       
-      
-      addSubview(radio0)
-      var tastenrect1 : NSRect = NSMakeRect(5 ,64 , tasteW,tasteH)
-      radio1 = rWeichenradio(frame:tastenrect1)
+      var tastenrect1 : NSRect = NSMakeRect(5 ,h/2  , tasteW,tasteH)
+      radio1 = rWeichenradio(frame:tastenrect1) // obere Taste
       //radio1.setValue(11)
       radio1.name = "radio1"
-      
+      radio0.state = .off
       addSubview(radio1)
+      
+      let symbolW:CGFloat = 20
+      let symbolH:CGFloat = 20
+      
+      
+      var symbolrect : NSRect = NSMakeRect(5 ,h/2 -  symbolH , symbolW,symbolH)
+      symbolView = NSImageView(frame:symbolrect) 
+      
+      symbolView.image = geradeimage
+      addSubview(symbolView)
       
       //var gruppenrect0 : NSRect = NSMakeRect(50 ,0 , tasteW,tasteH)
       
@@ -317,10 +335,12 @@ class rWeichenradioView:NSView
          var nr = 20 + 2*col
          weichenradiogruppe.weichengruppenummer = 20 + col
          weichenradiogruppe.radio0.setValue(nr)
+         weichenradiogruppe.radio0.state = .on
          weichenradiogruppe.radio0.tag = 2000+nr
          //weichenradiogruppe.radio0.action = #selector(self.weichenaktion)
          nr += 1
          weichenradiogruppe.radio1.setValue(nr)
+         //weichenradiogruppe.radio0.state = .off
          weichenradiogruppe.radio1.tag = 2000+nr
          weichenradiogruppe.hintergrundfarbe = .red
          weichenradiogruppe.titelFeld.stringValue = "\(col)"
@@ -361,7 +381,12 @@ class rWeichenradioView:NSView
       data_gerade = UInt8(8 * weiche) + 8
       if(ablenkung == 1)
       {
+         weichenarray[Int(weiche)].symbolView.image = ablenkungimage
          data_gerade += 4
+      }
+      else
+      {
+         weichenarray[Int(weiche)].symbolView.image = geradeimage
       }
       
       

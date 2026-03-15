@@ -100,7 +100,7 @@ class rWeichentastenView:NSView
       
       let w:CGFloat = bounds.size.width
       let h:CGFloat = bounds.size.height
-      let switchH = h/Double(numtasten)
+      let tasteH = h/Double(numtasten)
       let tasteW:CGFloat = 30
       identifier = NSUserInterfaceItemIdentifier("111")
       weiche = 10
@@ -113,7 +113,7 @@ class rWeichentastenView:NSView
       
       for row in 0..<numtasten
       {
-         let tastenrect = NSMakeRect(5,Double(row)*switchH , tasteW,switchH)
+         let tastenrect = NSMakeRect(5,Double(row)*tasteH , tasteW,tasteH)
          
          let ident = 2000 + 10 * row 
          //print("weichentastenview row: \(row)  ident: \(ident) weiche: \(weiche)")
