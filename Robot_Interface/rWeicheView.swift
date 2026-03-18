@@ -10,7 +10,7 @@ import Foundation
 import Cocoa
 import AppKit
 
-//var numtasten:Int = 8
+var numtasten:Int = 8
 
 let geradeimage:NSImage = NSImage(named: NSImage.Name("WS_Gerade"))!
 let ablenkungimage:NSImage = NSImage(named: NSImage.Name("WS_Ablenkung"))!
@@ -90,7 +90,6 @@ class rWeichenradiogruppeH:NSView
    var hintergrundfarbe = NSColor()
    
    var weichenstatus:[Int] = Array(repeating: 0, count: 2) 
-   var weichenstellung:UInt8 = 0;
    var radio0:rWeichenradio! 
    var radio1:rWeichenradio! 
    var titelFeld:NSTextField!
@@ -163,7 +162,6 @@ class rWeichenradiogruppeV:NSView
    var hintergrundfarbe: NSColor = .systemBlue
    
    var weichenstatus:[Int] = Array(repeating: 0, count: 2) 
-   var weichenstellung:UInt8 = 0;
    var radio0:rWeichenradio! 
    var radio1:rWeichenradio!
    var symbolView:NSImageView!
@@ -248,16 +246,17 @@ class rWeichenradiogruppeV:NSView
    
    
    
-   @objc func setWeichentasten()
+   @objc func setWeichentastenstatus()
    {
-      
+      self.radio0.state = .off
+      self.symbolView.image = geradeimage
       
    }
 }
 
 class rWeichenradioView:NSView
 {
-   var weiche:Int = 0
+   var weiche:UInt8 = 0
    
    var weichenradiogruppe0:rWeichenradiogruppeH!
    var weichenradiogruppe1:rWeichenradiogruppeH!
@@ -265,8 +264,8 @@ class rWeichenradioView:NSView
    var titelFeld:NSTextField!
    
    var hintergrundfarbe = NSColor()
-   var weichenstatus:[Int] = Array(repeating: 0, count: numtasten) // werte der tastenstellungen
-   var weichenstellung:UInt8 = 0;
+   
+   var weichenstellung:UInt8 = 0; // bits Stellung: 1 > Ablenklung
    var weichenarray:[rWeichenradiogruppeV] = []
    
    let n = 10
@@ -274,13 +273,39 @@ class rWeichenradioView:NSView
    
    
    
-   @objc func setWeichentasten()
+   @objc func setWeichenstatus(taste:UInt8)
    {
       Swift.print("setWeichentasten \(self.bounds.width)") 
       
    }
    
+   @IBAction func reportClear(_ sender: NSButton) 
+   {
+      Swift.print("reportClear") 
+      for i in 0..<numtasten
+      {
+         weichenarray[i].radio0.state = .on
+         weichenarray[i].symbolView.image = geradeimage
+         
+         //data_gerade = UInt8(8 * i) + 8
+      }
+      weichenstellung = 0;
+      weiche = 124
+      var data_gerade:UInt8 = 1
+      var ablenkung:UInt8 = 0;
+      let userinformation = ["message":"weichenaktion", "data": data_gerade, "weiche": weiche, "ablenkung": ablenkung, "weichenstellung": weichenstellung ] as [String : Any]
+      let nc = NotificationCenter.default
+      nc.post(name:Notification.Name(rawValue:"weichenstatus"),
+              object: nil,
+              userInfo: userinformation)
+
+      
+   }
    
+   @IBAction func reportUpdate(_ sender: NSButton) 
+   {
+      Swift.print("reportUpdate") 
+   }
    
    @IBAction func radioChanged(_ sender: NSButton) 
    {
@@ -309,10 +334,10 @@ class rWeichenradioView:NSView
       //self.layer?.backgroundColor =  NSColor.yellow.cgColor
       let w:CGFloat = bounds.size.width
       let h:CGFloat = bounds.size.height
-      var switchH:CGFloat = 32
+      let tasteH:CGFloat = 32
       let tasteW:CGFloat = 32
       let delta:CGFloat = 48
-      identifier = NSUserInterfaceItemIdentifier("111")
+      identifier = NSUserInterfaceItemIdentifier("weicheview")
       
       
       weiche = 15
@@ -320,15 +345,15 @@ class rWeichenradioView:NSView
       titelFeld = NSTextField(frame:titelfeldrect )
       
       addSubview(titelFeld)
-      titelFeld.integerValue = weiche
+      titelFeld.integerValue = Int(weiche)
       
       weichenarray.reserveCapacity(numtasten)
       
       
       for col in 0..<numtasten
       {
-         //let tastenrect = NSMakeRect(10 ,10 + CGFloat(row) * switchH, 2 * tasteW, switchH)
-         let grupperect = NSMakeRect(10 + CGFloat(col) * delta ,8 ,  tasteW, (3*switchH))
+         //let tastenrect = NSMakeRect(10 ,10 + CGFloat(row) * tasteH, 2 * tasteW, tasteH)
+         let grupperect = NSMakeRect(10 + CGFloat(col) * delta ,8 ,  tasteW, (3*tasteH))
          
          let weichenradiogruppe = rWeichenradiogruppeV(frame:(grupperect))
          weichenradiogruppe.wantsLayer = true
@@ -384,16 +409,18 @@ class rWeichenradioView:NSView
       {
          weichenarray[Int(weiche)].symbolView.image = ablenkungimage
          data_gerade += 4
+         weichenstellung |= (1 << weiche)
       }
       else
       {
          weichenarray[Int(weiche)].symbolView.image = geradeimage
+         weichenstellung &= ~(1 << weiche)
       }
       
       
       print("tastenstatusAktion data_gerade: \(data_gerade) data_ablenkung: \(data_ablenkung)")
       
-      let userinformation = ["message":"weichenaktion", "data": data_gerade, "weiche": weiche, "ablenkung": ablenkung ] as [String : Any]
+      let userinformation = ["message":"weichenaktion", "data": data_gerade, "weiche": weiche, "ablenkung": ablenkung, "weichenstellung": weichenstellung ] as [String : Any]
       let nc = NotificationCenter.default
       nc.post(name:Notification.Name(rawValue:"weichenstatus"),
               object: nil,

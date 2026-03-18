@@ -1045,8 +1045,15 @@ class rRobot: rViewController
          teensy.write_byteArray[8 + i] = addressarray[lok][i]
          //print(addressarray[lok][i])
       }
+      loadWeichenAddress()
       //print("loadLokAddress\(teensy.write_byteArray[8...11])")
    } // loadLokAddress
+   
+   @objc func loadWeichenAddress()
+   {
+      print("loadWeichenAddress")
+      
+   }
    
    
    @objc func loadFunktion(lok:Int)

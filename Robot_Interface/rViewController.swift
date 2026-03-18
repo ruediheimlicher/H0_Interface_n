@@ -396,39 +396,42 @@ class rViewController: NSViewController, NSWindowDelegate
       print("VC weichenstatusAktion info: \(info)")
       //guard var  weichenstatusint = notification.userInfo?["weichenstatus"]as? [Int] else {return}
       
-      guard var weichendata   = notification.userInfo?["data"]as? UInt8 else 
+       guard var weiche   = notification.userInfo?["weiche"]as? UInt8 else 
       {
-         print("weichetag tag ist nil")
+         print("weiche  ist nil")
          return
          
       }
-      guard var weiche   = notification.userInfo?["weiche"]as? UInt8 else 
+      
+      guard var weichenstellung   = notification.userInfo?["weichenstellung"]as? UInt8 else 
       {
-         print("weiche tag ist nil")
+         print("weichenstellung  ist nil")
          return
          
       }
+
+      
       print("VC weichenstatusAktion weiche: \(weiche)")
       
       guard var ablenkung   = notification.userInfo?["ablenkung"]as? UInt8 else 
       {
-         print("ablenkung tag ist nil")
+         print("ablenkung ist nil")
          return
          
       }
-      print("VC weichenstatusAktion ablenkung: \(ablenkung)")
+      print("VC weichenstatusAktion ablenkung: \(ablenkung) weichenstellung: \(weichenstellung)")
       
-      let weichenstatus:[UInt8] = [1,2,2,2]
+      let weichenstatus:[UInt8] = [2,2,2,1]
       teensy.write_byteArray[0] =  0b10111111// code
       
       //loknummer = ANZLOKS-1
       
-      let code = 0xBF
+      let code = 0xCC
       
       let loknummer = ANZLOKS-1
       
       teensy.write_byteArray[20] = UInt8(code)
-      teensy.write_byteArray[20] = UInt8(loknummer)
+      //teensy.write_byteArray[20] = UInt8(loknummer)
       teensy.write_byteArray[21] = 2 // sourcestatus
       
       
@@ -1559,6 +1562,8 @@ class rViewController: NSViewController, NSWindowDelegate
    @IBOutlet weak var clear_Ring: NSButton!
    @IBOutlet weak var emitterFeld: NSTextField!
    
+   @IBOutlet weak var Weichen_update: NSButton!
+   @IBOutlet weak var Weichen_clear: NSButton!
 }
 
 extension NSBezierPath
