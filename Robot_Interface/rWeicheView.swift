@@ -212,7 +212,7 @@ class rWeichenradiogruppeV:NSView
       let tasteW:CGFloat = 20
       let tasteH:CGFloat = 20
       
-      var tastenrect : NSRect = NSMakeRect(5 ,h/2 - 2 * tasteH , tasteW,tasteH)
+      var tastenrect : NSRect = NSMakeRect(9 ,h/2 - 2 * tasteH , tasteW,tasteH)
       var radiotaste0 = rWeichenradio(frame:tastenrect)
       
       radio0 = rWeichenradio(frame:tastenrect) // untere Taste
@@ -221,7 +221,7 @@ class rWeichenradiogruppeV:NSView
       radio0.name = "radio0"
       addSubview(radio0) 
       
-      var tastenrect1 : NSRect = NSMakeRect(5 ,h/2  , tasteW,tasteH)
+      var tastenrect1 : NSRect = NSMakeRect(9 ,h/2  , tasteW,tasteH)
       radio1 = rWeichenradio(frame:tastenrect1) // obere Taste
       //radio1.setValue(11)
       radio1.name = "radio1"
@@ -232,7 +232,7 @@ class rWeichenradiogruppeV:NSView
       let symbolH:CGFloat = 20
       
       
-      var symbolrect : NSRect = NSMakeRect(5 ,h/2 -  symbolH , symbolW,symbolH)
+      var symbolrect : NSRect = NSMakeRect(6 ,h/2 -  symbolH, symbolW,symbolH)
       symbolView = NSImageView(frame:symbolrect) 
       
       symbolView.image = geradeimage
@@ -384,7 +384,7 @@ class rWeichenradioView:NSView
    @objc  func tastenstatusAktion(_ notification:Notification) 
    {
       let info = notification.userInfo
-      print("rWeichenradioView tastenstatusAktion info: \(info)")
+      print("rWeicheView tastenstatusAktion info: \(info)")
       //guard let tastenstatus = notification.userInfo?["tastenstatus"]as? [Int] else {return}
       
       guard var weichetag   = notification.userInfo?["tag"]as? Int else 

@@ -169,6 +169,10 @@ class rRobot: rViewController
    
    @IBOutlet weak var autoscantaste: NSButton!
    
+   @IBOutlet weak var autoweichetaste: NSButton!
+   
+   var autorandomweiche = 0
+
    
    
    var scanautocounter:Int = 0
@@ -219,6 +223,8 @@ class rRobot: rViewController
    var sinarray:[UInt8] = [10,11,12,13,14,14,13,12,11,10,8,7,6,5,5,6,7,8,9]
    var pause:UInt8 = 5
    
+   var weicheautocounter = 0
+   
    var firstrun = 1 // Task in Startloop
    
    var sourcestatus:UInt8 = 0
@@ -266,6 +272,9 @@ class rRobot: rViewController
       NotificationCenter.default.addObserver(self, selector:#selector(drehknopfAktion(_:)),name:NSNotification.Name(rawValue: "drehknopf"),object:nil)
       
       NotificationCenter.default.addObserver(self, selector:#selector(tastenstatusAktion(_:)),name:NSNotification.Name(rawValue: "tastenstatus"),object:nil)
+      
+      NotificationCenter.default.addObserver(self, selector:#selector(weichenstatusAktion(_:)),name:NSNotification.Name(rawValue: "weichenstatus"),object:nil)
+
       
       let lookup_path =  "/Users/ruediheimlicher/Documents/H0_Daten/H0_Lookup.txt"
       lookuptable = getLookupTable(lookupURL:lookup_path) // [String]
@@ -606,7 +615,7 @@ class rRobot: rViewController
    @objc  func tastenstatusAktion(_ notification:Notification) 
    {
       let info = notification.userInfo
-      print("tastenstatusAktion info: \(info)")
+      print("Robot tastenstatusAktion info: \(info)")
       guard let tastenstatus = notification.userInfo?["tastenstatus"]as? [Int] else {return}
       
       guard var loknummer  = notification.userInfo?["lok"]as? Int else 
@@ -1232,8 +1241,7 @@ class rRobot: rViewController
          
          
          teensy.write_byteArray[21] = sourcestatus
-         
-         
+                  
          if (usbstatus > 0)
          {
             let senderfolg = teensy.send_USB()
@@ -1242,11 +1250,7 @@ class rRobot: rViewController
                print("Robot adress_scan senderfolg: \(senderfolg)")
             }
          }
-         
-         
-         
-         
-         scanautocounter += 1;
+          scanautocounter += 1;
          
          if(scanautocounter > 15)
          {
@@ -1269,7 +1273,61 @@ class rRobot: rViewController
       
    }// end adress_scan
    
+   @IBAction  func report_Weiche_auto(_ sender: NSButton)
+   {
+      startzeit = Int64(NSDate().timeIntervalSince1970)
+      print("autoweichetaste")
+      let minweiche = 0
+      let maxweiche = 8
+      let step = 1
+      let interval:Double = 2
+      weicheautocounter = 0 
+      var userinformation:NSMutableDictionary = ["minweiche": minweiche, "maxweiche": maxweiche, "step": step, "speedautocounter":speedautocounter] //as! [String : Int]
+      var timer : Timer? = nil
+      
+      timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(weiche_auto(_:)), userInfo: userinformation, repeats: true)
+
+
+      
+   }
    
+   @objc func weiche_auto(_ timer: Timer)
+   {
+      if (autoweichetaste.state.rawValue == 1)
+      {
+         var ablenkung = 0;
+         let       tempmin = autospeedminstepper.integerValue
+         var       tempmax = autospeedmaxstepper.integerValue
+         if(tempmax > 8)
+         {
+            tempmax = 8 
+         }
+         
+         if !(tempmax > tempmin)
+         {
+            tempmax = tempmin + 1
+         }
+         ablenkung =  weicheautocounter % 2
+         print("autorandomweiche vor: \( autorandomweiche)")
+         var oldautorandomweiche:Int = autorandomweiche
+      if weicheautocounter % 2 == 0
+         { 
+         while (oldautorandomweiche == autorandomweiche)
+         {
+            autorandomweiche = Int.random(in: tempmin..<tempmax)
+            
+         }
+         print("autorandomweiche nach: \( autorandomweiche)")
+         oldautorandomweiche = autorandomweiche
+      }
+         
+         self.weichentask(weiche: UInt8(autorandomweiche), ablenkung: UInt8(ablenkung))  
+         weicheautocounter += 1
+         
+         
+      }
+      
+   }
    
    @IBAction  func report_Speed_auto(_ sender: NSButton)
    {
@@ -1298,6 +1356,8 @@ class rRobot: rViewController
    }
    
    
+   
+   
    @objc func speed_auto(_ timer: Timer)
    {
       if (autospeedtaste.state.rawValue == 1)
@@ -1307,6 +1367,9 @@ class rRobot: rViewController
          //       {
          //print("step: \(dic["step"])")
          speedautocounter += 1
+         
+         
+         
          if speedautocounter > sinarray.count - 1
          {
             speedautocounter = 0 // neu beginnen
@@ -1315,7 +1378,7 @@ class rRobot: rViewController
          //      var tempmax:Int = dic["maxspeed"] as! Int
          //       var tempspeedautocounter = dic["speedautocounter"] as! Int
          
-         var       tempmin = autospeedminstepper.integerValue
+         let       tempmin = autospeedminstepper.integerValue
          var       tempmax = autospeedmaxstepper.integerValue
          if !(tempmax > tempmin)
          {
@@ -1350,7 +1413,6 @@ class rRobot: rViewController
          {
             randomInt += 1
          }
-         
          
          teensy.write_byteArray[0] = speedcodearray[0]
          

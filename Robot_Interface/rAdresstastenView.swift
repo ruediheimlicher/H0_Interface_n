@@ -25,6 +25,7 @@ class rAdresstaste:NSButton
       let t = self.tag
       //Swift.print("rAdresstaste init tag: \(t)")
       self.action = #selector(self.report_taste)
+      self.controlSize = .mini
    }
    
 
@@ -94,6 +95,7 @@ class rAdresstastenView:NSView
             let tastetag = taste.tag
             //print("tastetag: \(tastetag)")
             taste.target = self
+            taste.controlSize = .large
             taste.action = #selector(self.tastenaktion)
          }
          
